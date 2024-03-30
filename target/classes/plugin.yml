@@ -1,0 +1,7 @@
+name: PulseAuth
+version: 1.0.1-a
+main: com.pandapulsestudios.pulseauth.PulseAuth
+authors: [Closeplanet2, PandaPulseStudios]
+depend: [PulseCore, PulseConfig]
+api-version: 1.20
+
