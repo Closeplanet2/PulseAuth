@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.pandapulsestudios</groupId>
+    <artifactId>pulseauth</artifactId>
+    <version>1.0.0-a</version>
+    <packaging>jar</packaging>
+    <name>PulseAuth</name>
+
+    <distributionManagement>
+        <repository>
+            <id>github</id>
+            <name>GitHub OWNER Apache Maven Packages</name>
+            <url>https://maven.pkg.github.com/closeplanet2/PulseAuth</url>
+        </repository>
+    </distributionManagement>
+
+    <properties>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <repositories>
+        <repository>
+            <id>pulsecore</id>
+            <url>https://maven.pkg.github.com/closeplanet2/PulseCore</url>
+        </repository>
+        <repository>
+            <id>pulseconfig</id>
+            <url>https://maven.pkg.github.com/closeplanet2/PulseConfig</url>
+        </repository>
+    </repositories>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.spigotmc</groupId>
+            <artifactId>spigot</artifactId>
+            <version>1.20.1-R0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.pandapulsestudios</groupId>
+            <artifactId>pulsecore</artifactId>
+            <version>1.2.1-a</version>
+        </dependency>
+        <dependency>
+            <groupId>com.pandapulsestudios</groupId>
+            <artifactId>pulseconfig</artifactId>
+            <version>1.3.8-a</version>
+        </dependency>
+    </dependencies>
+</project>
