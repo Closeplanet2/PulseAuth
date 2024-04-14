@@ -1,11 +1,11 @@
 package com.pandapulsestudios.pulseauth.Configs;
 
 import com.pandapulsestudios.pulseauth.Enum.AuthMethod;
-import com.pandapulsestudios.pulseconfig.Enums.SaveableType;
-import com.pandapulsestudios.pulseconfig.Interfaces.IgnoreSave;
-import com.pandapulsestudios.pulseconfig.Interfaces.PulseClass;
-import com.pandapulsestudios.pulseconfig.Objects.Savable.SaveableArrayList;
-import com.pandapulsestudios.pulseconfig.Objects.Savable.SaveableHashmap;
+import com.pandapulsestudios.pulseconfig.Interface.DontSave;
+import com.pandapulsestudios.pulseconfig.Interface.PulseClass;
+import com.pandapulsestudios.pulseconfig.Objects.SaveableArrayList;
+import com.pandapulsestudios.pulseconfig.Objects.SaveableHashmap;
+import com.pandapulsestudios.pulsecore.Java.PulseAutoRegister;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -15,11 +15,11 @@ import java.util.UUID;
 
 public class UserMethodSettings implements PulseClass {
     public String playerName;
-    public SaveableHashmap<AuthMethod, Boolean> userRequiredPerMethod = new SaveableHashmap<>(SaveableType.CONFIG, AuthMethod.class, Boolean.class);
-    @IgnoreSave
-    public SaveableArrayList<AuthMethod> stillToAuth = new SaveableArrayList<>(SaveableType.CONFIG, AuthMethod.class);
-    @IgnoreSave
-    public SaveableArrayList<AuthMethod> hasValidated = new SaveableArrayList<>(SaveableType.CONFIG, AuthMethod.class);
+    public SaveableHashmap<AuthMethod, Boolean> userRequiredPerMethod = new SaveableHashmap<>(AuthMethod.class, Boolean.class);
+    @DontSave
+    public SaveableArrayList<AuthMethod> stillToAuth = new SaveableArrayList<>(AuthMethod.class);
+    @DontSave
+    public SaveableArrayList<AuthMethod> hasValidated = new SaveableArrayList<>(AuthMethod.class);
 
     public UserMethodSettings(){}
     public UserMethodSettings(String playerName){
@@ -27,30 +27,30 @@ public class UserMethodSettings implements PulseClass {
     }
 
     @Override
-    public void BeforeSave() {
+    public void BeforeSaveConfig() {
         for(var value : AuthMethod.values()){
-            if(!userRequiredPerMethod.hashMap.containsKey(value)){
-                userRequiredPerMethod.hashMap.put(value, true);
+            if(!userRequiredPerMethod.containsKey(value)){
+                userRequiredPerMethod.put(value, true);
             }
         }
     }
 
     public void ResetStillToAuthMethods(SaveableArrayList<AuthMethod> authMethods, SaveableHashmap<AuthMethod, Boolean> opBypassMethod, SaveableHashmap<AuthMethod, String> permBypassMethod,
                                         Player player, boolean cacheUserAuthUntilServerRestart){
-        stillToAuth.arrayList.clear();
+        stillToAuth.clear();
         if(!cacheUserAuthUntilServerRestart){
-            hasValidated.arrayList.clear();
+            hasValidated.clear();
         }
 
-        for(var authMethod : authMethods.arrayList){
-            var opBypass = opBypassMethod.hashMap.getOrDefault(authMethod, false);
-            var permBypass = permBypassMethod.hashMap.getOrDefault(authMethod, "");
+        for(var authMethod : authMethods.ReturnArrayList()){
+            var opBypass = opBypassMethod.getOrDefault(authMethod, false);
+            var permBypass = permBypassMethod.getOrDefault(authMethod, "");
             if(opBypass && player.isOp()) continue;
             if(!permBypass.isEmpty() && player.hasPermission(permBypass)) continue;
-            if(!userRequiredPerMethod.hashMap.getOrDefault(authMethod, true)) continue;
-            if(hasValidated.arrayList.contains(authMethod)) continue;
+            if(!userRequiredPerMethod.getOrDefault(authMethod, true)) continue;
+            if(hasValidated.contains(authMethod)) continue;
             player.sendMessage("Need to validate... " + authMethod.name());
-            stillToAuth.arrayList.add(authMethod);
+            stillToAuth.add(authMethod);
         }
     }
 }

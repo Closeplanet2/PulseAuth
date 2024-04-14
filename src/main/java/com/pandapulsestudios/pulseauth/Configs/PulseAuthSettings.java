@@ -2,13 +2,12 @@ package com.pandapulsestudios.pulseauth.Configs;
 
 import com.pandapulsestudios.pulseauth.Enum.AuthMethod;
 import com.pandapulsestudios.pulseauth.PulseAuth;
-import com.pandapulsestudios.pulseconfig.APIS.ConfigAPI;
-import com.pandapulsestudios.pulseconfig.Enums.SaveableType;
-import com.pandapulsestudios.pulseconfig.Interfaces.Config.PulseConfig;
-import com.pandapulsestudios.pulseconfig.Interfaces.ConfigComment;
-import com.pandapulsestudios.pulseconfig.Objects.Savable.SaveableArrayList;
-import com.pandapulsestudios.pulseconfig.Objects.Savable.SaveableHashmap;
+import com.pandapulsestudios.pulseconfig.Enum.StorageType;
+import com.pandapulsestudios.pulseconfig.Interface.PulseConfig;
+import com.pandapulsestudios.pulseconfig.Objects.SaveableArrayList;
+import com.pandapulsestudios.pulseconfig.Objects.SaveableHashmap;
 import com.pandapulsestudios.pulsecore.Chat.PulsePrompt;
+import com.pandapulsestudios.pulsecore.Java.PulseAutoRegister;
 import com.pandapulsestudios.pulsecore.Movement.MovementAPI;
 import com.pandapulsestudios.pulsecore.Player.PlayerAPI;
 import com.pandapulsestudios.pulsecore.Player.PlayerAction;
@@ -25,42 +24,37 @@ import java.util.UUID;
 //TODO limit every event
 //TODO New auth method - kick all no ops
 //TODO Kick all non perms
+@PulseAutoRegister
 public class PulseAuthSettings implements PulseConfig {
-    @Override
-    public String documentID() { return "PulseAuthSettings"; }
-
     @Override
     public JavaPlugin mainClass() { return PulseAuth.Instance; }
 
-    @Override
-    public boolean useSubFolder() { return false; }
-
-    public SaveableArrayList<AuthMethod> authMethods = new SaveableArrayList<>(SaveableType.CONFIG, AuthMethod.class);
-    public SaveableHashmap<AuthMethod, Boolean> opBypassMethod = new SaveableHashmap<>(SaveableType.CONFIG, AuthMethod.class, Boolean.class);
-    public SaveableHashmap<AuthMethod, String> permBypassMethod = new SaveableHashmap<>(SaveableType.CONFIG, AuthMethod.class, String.class);
-    public SaveableHashmap<UUID, UserMethodSettings> userMethodSettings = new SaveableHashmap<>(SaveableType.CONFIG, UUID.class, UserMethodSettings.class);
+    public SaveableArrayList<AuthMethod> authMethods = new SaveableArrayList<>(AuthMethod.class);
+    public SaveableHashmap<AuthMethod, Boolean> opBypassMethod = new SaveableHashmap<>(AuthMethod.class, Boolean.class);
+    public SaveableHashmap<AuthMethod, String> permBypassMethod = new SaveableHashmap<>(AuthMethod.class, String.class);
+    public SaveableHashmap<UUID, UserMethodSettings> userMethodSettings = new SaveableHashmap<>(UUID.class, UserMethodSettings.class);
     public boolean cacheUserAuthUntilServerRestart = false;
     public boolean requireAuthOnServerReload = false;
     public boolean kickPlayersOnServerReload = false;
 
     @Override
-    public void FirstLoad() {
+    public void FirstLoadConfig() {
         for(var value : AuthMethod.values()){
-            authMethods.arrayList.add(value);
-            opBypassMethod.hashMap.put(value, false);
-            permBypassMethod.hashMap.put(value, "");
+            authMethods.add(value);
+            opBypassMethod.put(value, false);
+            permBypassMethod.put(value, "");
         }
         for(var player : Bukkit.getOfflinePlayers()){
-            userMethodSettings.hashMap.put(player.getUniqueId(), new UserMethodSettings(player.getName()));
+            userMethodSettings.put(player.getUniqueId(), new UserMethodSettings(player.getName()));
         }
     }
 
     public void PlayerJoinServer(Player player, UserPasswords userPasswords, UserGoogleCodes userGoogleCodes){
-        var userMethod = userMethodSettings.hashMap.getOrDefault(player.getUniqueId(), null);
+        var userMethod = userMethodSettings.getOrDefault(player.getUniqueId(), null);
         if(userMethod == null) userMethod = new UserMethodSettings(player.getDisplayName());
         userMethod.ResetStillToAuthMethods(authMethods, opBypassMethod, permBypassMethod, player, cacheUserAuthUntilServerRestart);
 
-        if(!userMethod.stillToAuth.arrayList.isEmpty()){
+        if(!userMethod.stillToAuth.){
             if(PlayerAPI.CanPlayerAction(PlayerAction.PlayerMove, player)) MovementAPI.LockPlayerLocation(player, false, player.getLocation());
         }else{
             if(!PlayerAPI.CanPlayerAction(PlayerAction.PlayerMove, player)) MovementAPI.LockPlayerLocation(player, true, null);

@@ -1,33 +1,20 @@
 package com.pandapulsestudios.pulseauth;
 
-import com.mojang.authlib.yggdrasil.response.User;
 import com.pandapulsestudios.pulseauth.Configs.PulseAuthSettings;
 import com.pandapulsestudios.pulseauth.Configs.UserGoogleCodes;
 import com.pandapulsestudios.pulseauth.Configs.UserPasswords;
 import com.pandapulsestudios.pulseauth.Variables.AuthMethodVarTest;
-import com.pandapulsestudios.pulseconfig.APIS.ConfigAPI;
 import com.pandapulsestudios.pulsecore.Events.PulseCoreEvents;
 import com.pandapulsestudios.pulsecore.Java.ClassAPI;
-import com.pandapulsestudios.pulsecore.Java.JavaAPI;
 import com.pandapulsestudios.pulsecore.Java.PulseAutoRegister;
-import com.pandapulsestudios.pulsecore.Movement.MovementAPI;
-import com.pandapulsestudios.pulsecore.Player.PlayerAPI;
-import com.pandapulsestudios.pulsecore.Player.PlayerAction;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.conversations.Conversation;
-import org.bukkit.conversations.ConversationFactory;
-import org.bukkit.conversations.Prompt;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 import java.util.UUID;
 
 public final class PulseAuth extends JavaPlugin{
@@ -42,16 +29,6 @@ public final class PulseAuth extends JavaPlugin{
         Instance = this;
         ClassAPI.RegisterPulseVariableTest(new AuthMethodVarTest());
         ClassAPI.RegisterPulseCoreEvents(new EventLibrary());
-
-        PulseAuthSettings = new PulseAuthSettings();
-        ConfigAPI.Load(PulseAuthSettings, false);
-
-        UserPasswords = new UserPasswords();
-        ConfigAPI.Load(UserPasswords, false);
-
-        UserGoogleCodes = new UserGoogleCodes();
-        ConfigAPI.Load(UserGoogleCodes, false);
-
         if(PulseAuthSettings.requireAuthOnServerReload){
             for(var player : Bukkit.getOnlinePlayers()) PulseAuthSettings.PlayerJoinServer(player, UserPasswords, UserGoogleCodes);
         }
